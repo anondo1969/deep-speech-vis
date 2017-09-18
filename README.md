@@ -1,15 +1,11 @@
-Current Work:
+Description:
 
-    A baseline speech recognition software where the neural net is trained with 
+    1. A baseline speech recognition software where the neural net is trained with 
     tensorFlow and GMM training and decoding are done in kaldi toolkit.
 
-Future Plan:
-
-    1. Add a hidden layer visualization wrapper over the whole system.
+    2. Visualization of the relevance heatmap of the utterances.
     
-    2. Implement a graphical user interface for easy visualization and analysis
-    
-    3. Automate the analysis and recommendation process
+    3. Process of adding noise to the input features to create acoustic simulation
 
 
 Requirement:
