@@ -137,3 +137,11 @@ class features_extraction(object):
 
         return important_info
 
+
+def get_important_info(save_dir):
+
+    with open(save_dir+"/test_important_info", "rb") as fp:
+        important_info = pickle.load(fp)
+
+    return important_info
+
