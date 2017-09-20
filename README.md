@@ -82,7 +82,7 @@ How to Run:
                   tensorboard --logdir=your-exp-dir/NN_train_dir/logdir
 8. There are several methods for calculating relevance, choose them from the configuration file
 
-9. You can scale the image according to your choice in terms heat-map points by giving
+9. You can scale the image according to your choice in terms of heat-map points by giving
    value in the configuration file
 
 10. See the image containing heat-map in 'your-exp-dir/heat_map_image_dir'.
