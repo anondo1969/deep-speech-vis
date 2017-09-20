@@ -25,7 +25,7 @@ class Decode(object):
         self.total_uttarences = test_important_information['total_test_utterances']
         self.epochs = config.get('simple_NN', 'training_epochs')
 
-        with open(load_dir + "/utt_id", "rb") as fp:
+        with open(self.load_dir + "/utt_id", "rb") as fp:
             self.utt_id_list = pickle.load(fp)
 
         if not os.path.isdir(decode_dir):
