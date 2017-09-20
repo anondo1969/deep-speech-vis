@@ -89,14 +89,11 @@ class features_extraction(object):
         align_file.write(alignment_file_names_list)
         align_file.close()
 
-
-
         target_dict = {}
 
         raw_data = open(alignment_file_name)
         file_data = raw_data.read().split(' ')
         raw_data.close()
-
 
         for zip_file in file_data:
             zip_file = zip_file.replace("\n", "")
@@ -107,17 +104,7 @@ class features_extraction(object):
 
         return target_dict
 
-    def save_data(self, utt_mat, target_mat, batch_count):
-
-        save_dir = self.save_dir
-
-        with open(save_dir+"/utt_mat_"+str(batch_count), "wb") as fp: 
-            pickle.dump(utt_mat, fp)
-                   
-        with open(save_dir+"/target_mat_"+str(batch_count), "wb") as fp:
-            pickle.dump(target_mat, fp)
-
-    def save_target_prior(self, target_dict):
+    def save_target_prior(self):
         '''
         compute the count of the targets in the data
 
@@ -134,7 +121,7 @@ class features_extraction(object):
         self.max_target_length = 0
         target_array_list = []
 
-        for target_string in target_dict.values():
+        for target_string in self.target_dict.values():
             target_list = target_string.split(' ')
             if self.max_target_length < len(target_list):
                 self.max_target_length = len(target_list)
@@ -147,75 +134,47 @@ class features_extraction(object):
         #count the number of occurences of each target
         prior = np.bincount(all_targets, minlength=self.num_labels)
 
+        prior = prior.astype(np.float32)
+
         prior = prior/prior.sum()
 
-        np.save(self.pdf_file_dir + '/prior.npy', prior)
+        np.save(self.pdf_file_dir + '/prior_my_new_calculation.npy', prior)
 
 
-    def data_processing(self):
+    def get_target_array(self, utt_id):
 
-        target_dict = self.make_target_dict()
-        self.save_target_prior(target_dict)
+        target_sequence = self.target_dict[utt_id]
+        target_sequence_string_list = target_sequence.strip().split(' ')
+        targets_list = [int(i) for i in target_sequence_string_list]
+        targets = np.array(targets_list)
+ 
+        return targets
 
-        save_dir = self.save_dir
-        batch_size = self.batch_size
+    def get_uterance_list(self):
 
-        raw_data = open(self.ark_file_name)
-        file_data = raw_data.read().split("\n")
-        raw_data.close()
-        
         seq_length_count = 0
         max_length = 0
-        batch_count = 0
-        batch_utt_count = -1
         total_number_of_utterances = 0
         target_match = False
         input_dim = 0
         utt_id = ""
+        utterances = {}
         input_dim_check = False
+
+        raw_data = open(self.ark_file_name)
+        file_data = raw_data.read().split("\n")
+        raw_data.close()
 
         for line in file_data:
             list_line = line.split()
 
-            #print list_line
-
             if len(list_line) > 0:
-
-                if batch_utt_count == -1:
-            
-                    utt_mat = []
-                    target_mat = []
-                    batch_utt_count = 0
-
-
-                elif batch_utt_count == batch_size:
-                
-                    ##################################
-                    #before saving randomize the data
-                    combined = list(zip(utt_mat, target_mat))
-                    random.shuffle(combined)
-                    utt_mat, target_mat = zip(*combined)
-                    #################################
-
-                    self.save_data(utt_mat, target_mat, batch_count)
-                    
-                    #save the input dim number only once
-                    if input_dim_check == False:
-                        input_dim = utt_mat[0].shape[1]
-                        input_dim_check = True
-                        #print "Input dim: " + str(input_dim)
-                    
-                    utt_mat = []
-                    target_mat = []
-                    batch_utt_count = 0
-                    batch_count += 1
-
-                if list_line[1] == "[" and list_line[0] in target_dict:
+  
+                if list_line[1] == "[" and list_line[0] in self.target_dict:
 
                     target_match = True
                     utt_id = list_line[0]
                     features_per_frame = []
-
 
                 elif list_line[-1] == "]" and target_match:
     
@@ -230,16 +189,7 @@ class features_extraction(object):
 
                     if splice_done:
 
-                        utt_mat.append(splice_fetures_per_utt)
-
-                        #####################################
-                        # target matrix code
-                        target_sequence = target_dict[utt_id]
-                        target_sequence_string_list = target_sequence.strip().split(' ')
-                        targets_list = [int(i) for i in target_sequence_string_list]
-                        targets = np.array(targets_list)
-                        target_mat.append(targets)
-                        #####################################
+                        utterances[utt_id] = splice_fetures_per_utt
 
                         target_match = False
 
@@ -247,8 +197,12 @@ class features_extraction(object):
                             max_length = seq_length_count
 
                         seq_length_count = 0
-                        batch_utt_count += 1
                         total_number_of_utterances += 1
+
+                        #get the input dim number only once
+                        if input_dim_check == False:
+                            input_dim = splice_fetures_per_utt.shape[1]
+                            input_dim_check = True
 
                     else:
                         seq_length_count = 0
@@ -260,10 +214,95 @@ class features_extraction(object):
                     features_per_frame.append(fetures_list)
                     seq_length_count += 1
 
-        important_info = {'train_utt_max_length': max_length, 
-                   'training_batch_total': batch_count, 
-                   'total_training_utterances': total_number_of_utterances, 
-                   'input_dim': input_dim,
+        self.max_length = max_length
+        self.total_number_of_utterances = total_number_of_utterances
+        self.input_dim = input_dim
+
+        with open(save_dir+"/train_uttarences_dict", "wb") as fp:
+            pickle.dump(utterances, fp)
+
+        return utterances
+
+    def save_batch_data(self, kaldi_batch_data, kaldi_batch_labels, step):
+        
+        processed_batch_inputs, processed_batch_targets, processed_batch_input_seq_length, processed_batch_output_seq_length =self.process_kaldi_batch_data(kaldi_batch_data, kaldi_batch_labels)
+
+        np.save(self.save_dir+'/batch_inputs_'+str(step)+'.npy', processed_batch_inputs)
+        np.save(self.save_dir+'/batch_targets_'+str(step)+'.npy', processed_batch_targets)
+        np.save(self.save_dir+'/batch_input_seq_length_'+str(step)+'.npy', processed_batch_input_seq_length)
+        np.save(self.save_dir+'/batch_output_seq_length_'+str(step)+'.npy', processed_batch_output_seq_length)
+
+        batch_data_information_file = open(self.save_dir+'/batch_data_information', "a")
+        batch_data_information_file.write(self.save_dir+'/batch_inputs_'+str(step)+'.npy'+'\n')
+        batch_data_information_file.write(self.save_dir+'/batch_targets_'+str(step)+'.npy'+'\n')
+        batch_data_information_file.write(self.save_dir+'/batch_input_seq_length_'+str(step)+'.npy'+'\n')
+        batch_data_information_file.write(self.save_dir+'/batch_output_seq_length_'+str(step)+'.npy'+'\n')
+        batch_data_information_file.close()
+
+
+    def process_kaldi_batch_data(self, inputs, targets):
+        
+        #get a list of sequence lengths
+        input_seq_length = [i.shape[0] for i in inputs]
+        output_seq_length = [t.shape[0] for t in targets]
+
+        #pad all the inputs qnd targets to the max_length and put them in
+        #one array
+        padded_inputs = np.array([np.append(
+            i, np.zeros([self.max_length-i.shape[0], i.shape[1]]), 0)
+                                  for i in inputs])
+
+        padded_targets = np.array([np.append(
+            t, np.zeros(self.max_length-t.shape[0]), 0)
+                                   for t in targets])
+
+        #transpose the inputs and targets so they fit in the placeholders
+        batch_inputs = padded_inputs.transpose([1, 0, 2])
+        batch_targets = padded_targets.transpose()
+
+        batch_targets = batch_targets[:, :, np.newaxis]
+
+        return batch_inputs, batch_targets, input_seq_length, output_seq_length
+
+
+    def batch_data_processing(self, utterances_save=False):
+
+        self.target_dict = self.make_target_dict()
+
+        self.save_target_prior()
+
+        if utterances_save:
+            with open(save_dir+"/train_uttarences_dict", "rb") as fp:
+                utterances = pickle.load(fp)
+        else:
+            utterances = self.get_uterance_list()
+
+        utt_id_list = utterances.keys()
+        random_utt_id_list = random.shuffle(utt_id_list)
+
+        utt_mat = []
+        target_mat = []
+        batch_count = 0
+
+        for id_count in len(random_utt_id_list):
+
+            utt_key = random_utt_id_list[id_count]
+            utt_array = utterances[utt_key]
+            target_array = get_target_array(utt_key)
+            utt_mat.append(utt_array)
+            target_mat.append(target_array)
+
+            if (id_count + 1) % self.batch_size == 0:
+ 
+                self.save_batch_data(utt_mat, target_mat, batch_count)
+                utt_mat = []
+                target_mat = []
+                batch_count += 1
+
+        important_info = {'train_utt_max_length': self.max_length, 
+                   'training_batch_total': batch_count + 1, 
+                   'total_training_utterances': self.total_number_of_utterances, 
+                   'input_dim': self.input_dim,
                    'num_labels':self.num_labels,
                    'train_label_max_length':self.max_target_length}
 
@@ -271,4 +310,12 @@ class features_extraction(object):
             pickle.dump(important_info, fp)
 
         return important_info
+
+
+def get_important_info(save_dir):
+
+    with open(save_dir+"/train_important_info", "rb") as fp:
+        important_info = pickle.load(fp)
+
+    return important_info
 
