@@ -29,7 +29,7 @@ class features_extraction(object):
 
         Returns:
             a numpy array containing the spliced features, if the features are
-            too short to splice None will be returned
+            too short to splice original utterance will be returned
         '''
 
         context_width = self.context_width
@@ -97,10 +97,7 @@ class features_extraction(object):
         '''
         compute the count of the targets in the data
 
-        Returns:
-            a numpy array containing the counts of the targets
         '''
-
         #get number of output labels
         numpdfs = open(self.pdf_file_dir + '/graph/num_pdfs')
         num_labels = numpdfs.read()
