@@ -33,10 +33,7 @@ if TRAIN_FEATURE_EXTRACTION:
    
     train_features = train_features_extraction.features_extraction(config)
 
-    #before calling please check in the save directory the utterance dictionary is saved
-    #already or not and give the 'utterances_save' value accordingly.
-    #It will save a lot of time.
-    train_important_information = train_features.batch_data_processing(utterances_save=False)
+    train_important_information = train_features.batch_data_processing()
 
     print train_important_information
 
