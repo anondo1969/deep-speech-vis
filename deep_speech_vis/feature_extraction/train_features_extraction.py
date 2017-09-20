@@ -62,18 +62,7 @@ class features_extraction(object):
         return utt_spliced, True
 
     def make_target_dict(self):
-        '''
-        read the file containing the state alignments
-
-        Args:
-            target_path: path to the alignment file
-
-        Returns:
-            A dictionary containing
-                - Key: Utterance ID
-                - Value: The state alignments as a space seperated string
-        '''
-
+       
         #put all the alignments in one file
         all_ali_files = [self.pdf_file_dir + '/pdf.' + str(i+1) + '.gz' for i in range(self.pdf_file_total)]
         
