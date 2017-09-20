@@ -41,7 +41,7 @@ How to Run:
 	   to only 'graph' and copy it inside of the 'alignment directory'
 
 	d. Copy the whole 'alignment directory' inside of the 
-	   'deep_speech_vis/exp_dir/your-corpus-name/' directory. 
+	   ' 'your-exp-dir' directory. 
 	   (for details see the 'deep_speech_vis_configuration.cfg' file)
 	   
 	e. Convert the kaldi ark files to text files and append those in a single 
