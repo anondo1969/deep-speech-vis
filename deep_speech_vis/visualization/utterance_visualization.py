@@ -14,10 +14,15 @@ import pickle
 
 class Visualize_single_utterance(object):
 
-    def __init__(self, random_utterance_id, utt_dir, save_dir, max_length, input_dim, image_dir):
+    def __init__(self, config, train_important_information, test_important_information):
 
+        utt_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
+        random_utterance_id = int (config.get('visualization', 'random_utterance_id'))
         with open(utt_dir+"/utt_"+str(random_utterance_id), "rb") as fp:
             utt_mat = pickle.load(fp)
+
+        utt_mat = np.array(utt_mat)
+        utt_mat = utt_mat.reshape(utt_mat.shape[1], utt_mat.shape[2])
 
         input_seq_length = [utt_mat.shape[0]]
         #pad the inputs
@@ -25,9 +30,11 @@ class Visualize_single_utterance(object):
 
         self.input_seq_length = input_seq_length
         self.utt_mat = utt_mat
-        self.save_dir = save_dir
-        self.max_length = max_length
-        self.input_dim = input_dim
+        self.save_dir = config.get('directories', 'exp_dir') + '/NN_train_dir'
+        self.max_length = test_important_information['test_utt_max_length']
+        self.input_dim = train_important_information['input_dim']
+
+        image_dir = config.get('directories', 'exp_dir') + '/heat_map_image_dir'
 
         if not os.path.isdir(image_dir):
             os.mkdir(image_dir)
