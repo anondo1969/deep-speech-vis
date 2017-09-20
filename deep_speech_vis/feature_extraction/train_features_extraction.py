@@ -7,17 +7,18 @@ import shutil
 
 class features_extraction(object):
 
-    def __init__(self, context_width, ark_file_name, save_dir, batch_size, pdf_file_dir, pdf_file_total):
+    def __init__(self, config):
 
-        self.context_width = context_width
-        self.ark_file_name = ark_file_name
-        self.save_dir = save_dir
-        self.batch_size = batch_size
-        self.pdf_file_dir = pdf_file_dir
-        self.pdf_file_total = pdf_file_total
+        self.context_width = int(config.get('simple_NN', 'context_width'))
+        self.ark_file_name = config.get('directories', 'train_ark')
+        self.save_dir = config.get('directories', 'exp_dir') + '/train_features_dir'
+        self.batch_size = int(config.get('simple_NN', 'batch_size'))
+        self.pdf_file_dir = config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name')
+        self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
 
-        if not os.path.isdir(save_dir):
-            os.mkdir(save_dir)
+
+        if not os.path.isdir(self.save_dir):
+            os.mkdir(self.save_dir)
 
 
         self.temp_dir = self.save_dir + '/temp_dir'
