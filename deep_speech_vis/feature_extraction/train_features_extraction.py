@@ -124,7 +124,7 @@ class features_extraction(object):
 
         prior = prior/prior.sum()
 
-        np.save(self.pdf_file_dir + '/prior_my_new_calculation.npy', prior)
+        np.save(self.pdf_file_dir + '/prior.npy', prior)
 
 
     def get_target_array(self, utt_id):
