@@ -20,7 +20,7 @@ class Simple_multy_layer_perceptron(object):
         ### DATASET
         ##########################
         
-        data_dir = config.get('directories', 'exp_dir')  + '/train_padded_batch_dir'
+        data_dir = config.get('directories', 'exp_dir')  + '/train_features_dir'
         NN_dir = config.get('directories', 'exp_dir')  + '/NN_train_dir'
 
         if not os.path.isdir(NN_dir):
