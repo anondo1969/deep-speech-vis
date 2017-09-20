@@ -3,20 +3,26 @@ import gzip
 import pickle
 import random
 import os
+import shutil
 
 class features_extraction(object):
 
-    def __init__(self, config):
+    def __init__(self, context_width, ark_file_name, save_dir, batch_size, pdf_file_dir, pdf_file_total):
 
-        self.context_width = int(config.get('simple_NN', 'context_width'))
-        self.ark_file_name = config.get('directories', 'train_ark')
-        self.save_dir = config.get('directories', 'exp_dir') + '/train_features_dir'
-        self.batch_size = int(config.get('simple_NN', 'batch_size'))
-        self.pdf_file_dir = config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name')
-        self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
+        self.context_width = context_width
+        self.ark_file_name = ark_file_name
+        self.save_dir = save_dir
+        self.batch_size = batch_size
+        self.pdf_file_dir = pdf_file_dir
+        self.pdf_file_total = pdf_file_total
 
-        if not os.path.isdir(self.save_dir):
-            os.mkdir(self.save_dir)
+        if not os.path.isdir(save_dir):
+            os.mkdir(save_dir)
+
+
+        self.temp_dir = self.save_dir + '/temp_dir'
+        if not os.path.isdir(self.temp_dir):
+            os.mkdir(self.temp_dir)
 
     def splice(self, utt):
         '''
@@ -29,7 +35,7 @@ class features_extraction(object):
 
         Returns:
             a numpy array containing the spliced features, if the features are
-            too short to splice original utterance will be returned
+            too short to splice None will be returned
         '''
 
         context_width = self.context_width
@@ -62,7 +68,18 @@ class features_extraction(object):
         return utt_spliced, True
 
     def make_target_dict(self):
-       
+        '''
+        read the file containing the state alignments
+
+        Args:
+            target_path: path to the alignment file
+
+        Returns:
+            A dictionary containing
+                - Key: Utterance ID
+                - Value: The state alignments as a space seperated string
+        '''
+
         #put all the alignments in one file
         all_ali_files = [self.pdf_file_dir + '/pdf.' + str(i+1) + '.gz' for i in range(self.pdf_file_total)]
         
@@ -97,7 +114,10 @@ class features_extraction(object):
         '''
         compute the count of the targets in the data
 
+        Returns:
+            a numpy array containing the counts of the targets
         '''
+
         #get number of output labels
         numpdfs = open(self.pdf_file_dir + '/graph/num_pdfs')
         num_labels = numpdfs.read()
@@ -124,7 +144,7 @@ class features_extraction(object):
 
         prior = prior/prior.sum()
 
-        np.save(self.pdf_file_dir + '/prior.npy', prior)
+        np.save(self.pdf_file_dir + '/prior_my_new_calculation.npy', prior)
 
 
     def get_target_array(self, utt_id):
@@ -161,6 +181,7 @@ class features_extraction(object):
                     target_match = True
                     utt_id = list_line[0]
                     features_per_frame = []
+                    
 
                 elif list_line[-1] == "]" and target_match:
     
@@ -175,7 +196,8 @@ class features_extraction(object):
 
                     if splice_done:
 
-                        utterances[utt_id] = splice_fetures_per_utt
+                        utterances[utt_id] = total_number_of_utterances
+                        np.save(self.temp_dir + '/utt_'+str(total_number_of_utterances)+'.npy', splice_fetures_per_utt)
 
                         target_match = False
 
@@ -184,6 +206,7 @@ class features_extraction(object):
 
                         seq_length_count = 0
                         total_number_of_utterances += 1
+                        print 'utt_no: ' + str(total_number_of_utterances) + ' utt_id: ' + utt_id
 
                         #get the input dim number only once
                         if input_dim_check == False:
@@ -204,9 +227,6 @@ class features_extraction(object):
         self.total_number_of_utterances = total_number_of_utterances
         self.input_dim = input_dim
 
-        with open(save_dir+"/train_uttarences_dict", "wb") as fp:
-            pickle.dump(utterances, fp)
-
         return utterances
 
     def save_batch_data(self, kaldi_batch_data, kaldi_batch_labels, step):
@@ -224,6 +244,8 @@ class features_extraction(object):
         batch_data_information_file.write(self.save_dir+'/batch_input_seq_length_'+str(step)+'.npy'+'\n')
         batch_data_information_file.write(self.save_dir+'/batch_output_seq_length_'+str(step)+'.npy'+'\n')
         batch_data_information_file.close()
+
+        print 'Batch ' + str(step + 1) + ' completed'
 
 
     def process_kaldi_batch_data(self, inputs, targets):
@@ -251,17 +273,13 @@ class features_extraction(object):
         return batch_inputs, batch_targets, input_seq_length, output_seq_length
 
 
-    def batch_data_processing(self, utterances_save=False):
+    def batch_data_processing(self):
 
         self.target_dict = self.make_target_dict()
 
         self.save_target_prior()
 
-        if utterances_save:
-            with open(save_dir+"/train_uttarences_dict", "rb") as fp:
-                utterances = pickle.load(fp)
-        else:
-            utterances = self.get_uterance_list()
+        utterances = self.get_uterance_list()
 
         utt_id_list = utterances.keys()
         random_utt_id_list = random.shuffle(utt_id_list)
@@ -273,7 +291,8 @@ class features_extraction(object):
         for id_count in len(random_utt_id_list):
 
             utt_key = random_utt_id_list[id_count]
-            utt_array = utterances[utt_key]
+            utt_id = utterances[utt_key]
+            utt_array = np.load(self.temp_dir + '/utt_'+str(utt_id)+'.npy')
             target_array = get_target_array(utt_key)
             utt_mat.append(utt_array)
             target_mat.append(target_array)
@@ -294,6 +313,8 @@ class features_extraction(object):
 
         with open(save_dir+"/train_important_info", "wb") as fp:
             pickle.dump(important_info, fp)
+
+        shutil.rmtree(self.temp_dir)
 
         return important_info
 
