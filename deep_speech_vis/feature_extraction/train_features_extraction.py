@@ -25,6 +25,7 @@ class features_extraction(object):
         if not os.path.isdir(self.temp_dir):
             os.mkdir(self.temp_dir)
 
+
     def splice(self, utt):
         '''
         splice the utterance
@@ -157,7 +158,7 @@ class features_extraction(object):
  
         return targets
 
-    def get_uterance_list(self):
+    def get_utterance_array(self):
 
         seq_length_count = 0
         max_length = 0
@@ -165,8 +166,8 @@ class features_extraction(object):
         target_match = False
         input_dim = 0
         utt_id = ""
-        utterances = {}
         input_dim_check = False
+        utt_dict = {}
 
         raw_data = open(self.ark_file_name)
         file_data = raw_data.read().split("\n")
@@ -196,8 +197,7 @@ class features_extraction(object):
                     splice_fetures_per_utt, splice_done = self.splice(fetures_per_utt)
 
                     if splice_done:
-
-                        utterances[utt_id] = total_number_of_utterances
+                        utt_dict[utt_id] = total_number_of_utterances
                         np.save(self.temp_dir + '/utt_'+str(total_number_of_utterances)+'.npy', splice_fetures_per_utt)
 
                         target_match = False
@@ -228,7 +228,10 @@ class features_extraction(object):
         self.total_number_of_utterances = total_number_of_utterances
         self.input_dim = input_dim
 
-        return utterances
+        with open(self.save_dir+"/utt_dict", "wb") as fp:
+            pickle.dump(utt_dict, fp)
+
+        return utt_dict
 
     def save_batch_data(self, kaldi_batch_data, kaldi_batch_labels, step):
         
@@ -280,21 +283,21 @@ class features_extraction(object):
 
         self.save_target_prior()
 
-        utterances = self.get_uterance_list()
+        utt_dict = self.get_utterance_array()
 
         utt_id_list = utterances.keys()
-        random_utt_id_list = random.shuffle(utt_id_list)
+        random.shuffle(utt_id_list)
 
         utt_mat = []
         target_mat = []
         batch_count = 0
 
-        for id_count in len(random_utt_id_list):
+        for id_count in range(len(utt_id_list)):
 
-            utt_key = random_utt_id_list[id_count]
-            utt_id = utterances[utt_key]
+            utt_key = utt_id_list[id_count]
+            utt_id = utt_dict[utt_key]
             utt_array = np.load(self.temp_dir + '/utt_'+str(utt_id)+'.npy')
-            target_array = get_target_array(utt_key)
+            target_array = self.get_target_array(utt_key)
             utt_mat.append(utt_array)
             target_mat.append(target_array)
 
@@ -312,10 +315,10 @@ class features_extraction(object):
                    'num_labels':self.num_labels,
                    'train_label_max_length':self.max_target_length}
 
-        with open(save_dir+"/train_important_info", "wb") as fp:
+        with open(self.save_dir+"/train_important_info", "wb") as fp:
             pickle.dump(important_info, fp)
 
-        shutil.rmtree(self.temp_dir)
+        #shutil.rmtree(self.temp_dir)
 
         return important_info
 
