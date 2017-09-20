@@ -14,14 +14,15 @@ import os
 
 class Decode(object):
 
-    def __init__(self, config, max_length, input_dim, total_uttarences, load_dir, decode_dir):
+    def __init__(self, config, train_important_information, test_important_information):
 
-        self.load_dir = load_dir
+        decode_dir = config.get('directories', 'exp_dir') + '/NN_decode_dir'
+        self.load_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
         self.save_dir = config.get('directories', 'exp_dir')  + '/NN_train_dir'
-        self.max_length = max_length
-        self.input_dim = input_dim
+        self.max_length = test_important_information['test_utt_max_length']
+        self.input_dim = train_important_information['input_dim']
         self.prior = np.load(config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name') + '/prior.npy')
-        self.total_uttarences = total_uttarences
+        self.total_uttarences = test_important_information['total_test_utterances']
         self.epochs = config.get('simple_NN', 'training_epochs')
 
         with open(load_dir + "/utt_id", "rb") as fp:
