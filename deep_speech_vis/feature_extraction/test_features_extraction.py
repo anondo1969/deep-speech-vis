@@ -6,12 +6,12 @@ import os
 
 class features_extraction(object):
 
-    def __init__(self, context_width, ark_file_name, save_dir, batch_size):
+    def __init__(self, config):
 
-        self.context_width = context_width
-        self.ark_file_name = ark_file_name
-        self.save_dir = save_dir
-        self.batch_size = batch_size
+        self.context_width = int(config.get('simple_NN', 'context_width'))
+        self.ark_file_name = config.get('directories', 'test_ark')
+        self.save_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
+        self.batch_size = int(config.get('simple_NN', 'batch_size'))
 
         if not os.path.isdir(save_dir):
             os.mkdir(save_dir)
