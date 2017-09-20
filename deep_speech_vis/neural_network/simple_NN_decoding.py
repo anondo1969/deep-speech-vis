@@ -10,6 +10,7 @@ import tensorflow as tf
 import numpy as np
 import seq_convertors
 import pickle
+import os
 
 class Decode(object):
 
@@ -34,7 +35,7 @@ class Decode(object):
 
         config = tf.ConfigProto()
         #config.gpu_options.allow_growth = True
-        config.gpu_options.per_process_gpu_memory_fraction = 0.8
+        config.gpu_options.per_process_gpu_memory_fraction = 0.5
 
 
         with tf.Session(config=config) as sess:
@@ -110,7 +111,7 @@ class Decode(object):
 
         config = tf.ConfigProto()
         #config.gpu_options.allow_growth = True
-        config.gpu_options.per_process_gpu_memory_fraction = 0.8
+        config.gpu_options.per_process_gpu_memory_fraction = 0.5
 
 
         with tf.Session(graph=g, config=config) as sess:
@@ -123,6 +124,9 @@ class Decode(object):
 
                 with open(self.load_dir+"/utt_"+str(i), "rb") as fp:
                     utt_mat = pickle.load(fp)
+
+                utt_mat = np.array(utt_mat)
+                utt_mat = utt_mat.reshape(utt_mat.shape[1], utt_mat.shape[2])
 
                 utt_id = self.utt_id_list[i]
 
