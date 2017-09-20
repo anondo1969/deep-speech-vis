@@ -14,7 +14,7 @@ import pickle
 
 class Simple_multy_layer_perceptron(object):
 
-    def train_NN(self, config, n_classes, input_dim, total_batch, max_input_length, max_target_length):
+    def train_NN(self, config, train_important_information):
 
         ##########################
         ### DATASET
@@ -41,10 +41,14 @@ class Simple_multy_layer_perceptron(object):
         # Architecture
         n_hidden_1 = int(config.get('simple_NN', 'n_hidden_1'))
         n_hidden_2 = int(config.get('simple_NN', 'n_hidden_2'))
-        n_input = input_dim
+        n_input = train_important_information['input_dim']
         training_epochs = int(config.get('simple_NN', 'training_epochs'))
         batch_size = int(config.get('simple_NN', 'batch_size'))
         valid_batch_number = int(config.get('simple_NN', 'valid_batches'))
+        n_classes = train_important_information['num_labels']
+        total_batch = train_important_information['training_batch_total']
+        max_input_length = train_important_information['train_utt_max_length']
+        max_target_length = train_important_information['train_label_max_length']
 
         ##########################
         ### GRAPH DEFINITION
