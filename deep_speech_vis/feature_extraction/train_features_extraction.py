@@ -15,8 +15,8 @@ class features_extraction(object):
         self.pdf_file_dir = config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name')
         self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
 
-        if not os.path.isdir(save_dir):
-            os.mkdir(save_dir)
+        if not os.path.isdir(self.save_dir):
+            os.mkdir(self.save_dir)
 
     def splice(self, utt):
         '''
