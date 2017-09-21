@@ -1,6 +1,6 @@
 '''
 @author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
-@date: 26.08.2017
+@date: 21.09.2017
 @version: 1.0+
 @copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
 @license : MIT License
@@ -25,11 +25,14 @@ class Decode(object):
         self.total_uttarences = test_important_information['total_test_utterances']
         self.epochs = config.get('simple_NN', 'training_epochs')
 
-        with open(self.load_dir + "/utt_id", "rb") as fp:
-            self.utt_id_list = pickle.load(fp)
+        with open(load_dir + "/utt_dict", "rb") as fp:
+            self.utt_dict = pickle.load(fp)
 
-        if not os.path.isdir(decode_dir):
-            os.mkdir(decode_dir)
+        self.utt_id_list = utt_dict.keys()
+
+        self.decode_dir = config.get('directories', 'exp_dir') + '/NN_decode_dir'
+        if not os.path.isdir(self.decode_dir):
+            os.mkdir(self.decode_dir)
 
 
     def retrieved_data(self):
@@ -123,14 +126,10 @@ class Decode(object):
 
             for i in range(self.total_uttarences):
 
-                with open(self.load_dir+"/utt_"+str(i), "rb") as fp:
-                    utt_mat = pickle.load(fp)
-
-                utt_mat = np.array(utt_mat)
-                utt_mat = utt_mat.reshape(utt_mat.shape[1], utt_mat.shape[2])
-
                 utt_id = self.utt_id_list[i]
 
+                utt_mat = self.utt_dict[utt_id]
+                
                 input_seq_length = [utt_mat.shape[0]]
                 #pad the inputs
                 utt_mat = np.append( utt_mat, np.zeros([self.max_length-utt_mat.shape[0], 
