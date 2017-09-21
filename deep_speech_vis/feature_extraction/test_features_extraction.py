@@ -1,3 +1,11 @@
+'''
+@author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@date: 21.09.2017
+@version: 1.0+
+@copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@license : MIT License
+'''
+
 import numpy as np
 import gzip
 import pickle
@@ -13,8 +21,8 @@ class features_extraction(object):
         self.save_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
         self.batch_size = int(config.get('simple_NN', 'batch_size'))
 
-        if not os.path.isdir(save_dir):
-            os.mkdir(save_dir)
+        if not os.path.isdir(self.save_dir):
+            os.mkdir(self.save_dir)
 
     def splice(self, utt):
         '''
@@ -27,7 +35,7 @@ class features_extraction(object):
 
         Returns:
             a numpy array containing the spliced features, if the features are
-            too short to splice None will be returned
+            too short to splice then the original utterance will be returned
         '''
 
         context_width = self.context_width
@@ -59,24 +67,15 @@ class features_extraction(object):
 
         return utt_spliced, True
 
-
-    def save_data(self, utt, utt_count):
-
-        save_dir = self.save_dir
-
-        with open(save_dir+"/utt_"+str(utt_count), "wb") as fp: 
-            pickle.dump(utt, fp)
-
-
     def data_processing(self):
         
-        save_dir = self.save_dir
+        utt_dict = {}
 
         raw_data = open(self.ark_file_name)
         file_data = raw_data.read().split("\n")
         raw_data.close()
 
-        utt_id = []
+        utt_id = ""
         seq_length_count = 0
         max_length = 0
         total_number_of_utterances = 0
@@ -88,11 +87,9 @@ class features_extraction(object):
 
                 if list_line[1] == "[":
 
-                        utt_id.append(list_line[0])
+                        utt_id = list_line[0]
                         features_per_frame = []
-                        utt_mat = []
-
-
+ 
                 elif list_line[-1] == "]":
     
                     del list_line[-1]
@@ -106,8 +103,7 @@ class features_extraction(object):
 
                     if splice_done:
 
-                        utt_mat.append(splice_fetures_per_utt)
-                        self.save_data(utt_mat, total_number_of_utterances)
+                        utt_dict[utt_id] = splice_fetures_per_utt
                         
                         if seq_length_count > max_length:
                             max_length = seq_length_count
@@ -117,7 +113,6 @@ class features_extraction(object):
 
                     else:
 
-                        del utt_id[-1]
                         seq_length_count = 0
 
                 else:
@@ -126,13 +121,13 @@ class features_extraction(object):
                     features_per_frame.append(fetures_list)
                     seq_length_count += 1
 
-        with open(save_dir+"/utt_id", "wb") as fp:
-            pickle.dump(utt_id, fp)
+        with open(self.save_dir+"/utt_dict", "wb") as fp:
+            pickle.dump(utt_dict, fp)
 
         important_info = {'test_utt_max_length': max_length,  
                    'total_test_utterances': total_number_of_utterances}
 
-        with open(save_dir+"/test_important_info", "wb") as fp:
+        with open(self.save_dir+"/test_important_info", "wb") as fp:
             pickle.dump(important_info, fp)
 
         return important_info
