@@ -11,6 +11,7 @@ import numpy as np
 from neural_network import seq_convertors
 import analyze_relevance
 import pickle
+import os
 
 class Visualize_single_utterance(object):
 
@@ -18,21 +19,25 @@ class Visualize_single_utterance(object):
 
         utt_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
         random_utterance_id = int (config.get('visualization', 'random_utterance_id'))
-        
+               
         with open(utt_dir+"/utt_dict", "rb") as fp:
             utt_dict = pickle.load(fp)
+      
         utt_id_list = utt_dict.keys()
+
         utt_id = utt_id_list[random_utterance_id]
         utt_mat = utt_dict[utt_id]
-
+   
         self.input_seq_length = [utt_mat.shape[0]]
-        #pad the inputs
-        self.utt_mat = np.append(utt_mat, np.zeros([max_length-utt_mat.shape[0], utt_mat.shape[1]]), 0)
-
-        self.save_dir = config.get('directories', 'exp_dir') + '/NN_train_dir'
+        
         self.max_length = test_important_information['test_utt_max_length']
-        self.input_dim = train_important_information['input_dim']
 
+        #pad the inputs
+        self.utt_mat = np.append(utt_mat, np.zeros([self.max_length-utt_mat.shape[0], utt_mat.shape[1]]), 0)
+        self.save_dir = config.get('directories', 'exp_dir') + '/NN_train_dir'
+        
+        self.input_dim = train_important_information['input_dim']
+        
         image_dir = config.get('directories', 'exp_dir') + '/heat_map_image_dir'
 
         if not os.path.isdir(image_dir):
@@ -77,10 +82,6 @@ class Visualize_single_utterance(object):
 
         self.retrieved_data()
         
-        config = tf.ConfigProto()
-        #config.gpu_options.allow_growth = True
-        config.gpu_options.per_process_gpu_memory_fraction = 0.8
-
         ##########################
         ### GRAPH DEFINITION
         ##########################
@@ -113,6 +114,11 @@ class Visualize_single_utterance(object):
         ##########################
         ###      EVALUATION
         ##########################
+
+        config = tf.ConfigProto()
+        #config.gpu_options.allow_growth = True
+        config.gpu_options.per_process_gpu_memory_fraction = 0.8
+
 
         with tf.Session(graph=g, config=config) as sess:
 
