@@ -25,10 +25,10 @@ class Decode(object):
         self.total_uttarences = test_important_information['total_test_utterances']
         self.epochs = config.get('simple_NN', 'training_epochs')
 
-        with open(load_dir + "/utt_dict", "rb") as fp:
+        with open(self.load_dir + "/utt_dict", "rb") as fp:
             self.utt_dict = pickle.load(fp)
 
-        self.utt_id_list = utt_dict.keys()
+        self.utt_id_list = self.utt_dict.keys()
 
         self.decode_dir = config.get('directories', 'exp_dir') + '/NN_decode_dir'
         if not os.path.isdir(self.decode_dir):
