@@ -1,6 +1,6 @@
 '''
 @author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
-@date: 26.08.2017
+@date: 21.09.2017
 @version: 1.0+
 @copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
 @license : MIT License
@@ -46,7 +46,7 @@ class Simple_multy_layer_perceptron(object):
         batch_size = int(config.get('simple_NN', 'batch_size'))
         valid_batch_number = int(config.get('simple_NN', 'valid_batches'))
         n_classes = train_important_information['num_labels']
-        total_batch = train_important_information['training_batch_total']
+        total_batch = train_important_information['training_batch_total'] - 1 #temp
         max_input_length = train_important_information['train_utt_max_length']
         max_target_length = train_important_information['train_label_max_length']
 
@@ -61,7 +61,7 @@ class Simple_multy_layer_perceptron(object):
         
                 #create the inputs placeholder
                 inputs = tf.placeholder(
-                tf.float32, shape=[max_input_length, batch_size, input_dim], name='features')
+                tf.float32, shape=[max_input_length, batch_size, n_input], name='features')
 
                 #the length of all the input sequences
                 input_seq_length = tf.placeholder(
