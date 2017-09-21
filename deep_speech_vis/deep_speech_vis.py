@@ -1,5 +1,14 @@
+'''
+@author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@date: 21.09.2017
+@version: 1.0+
+@copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@license : MIT License
+'''
+
 '''@file main.py
 run this file to go through the neural net training procedure, look at the 'deep_speech_vis_configuration.cfg' file to modify the settings'''
+
 import os
 from six.moves import configparser
 from feature_extraction import train_features_extraction, test_features_extraction
@@ -13,8 +22,8 @@ import pickle
 # any module succefully more than once
 
 # All modules
-TRAIN_FEATURE_EXTRACTION = True
-TRAIN_NN = False
+TRAIN_FEATURE_EXTRACTION = False
+TRAIN_NN = True
 TEST_FEATURE_EXTRACTION = False
 DECODE_NN = False
 DECODE_KALDI = False
@@ -38,6 +47,7 @@ if TRAIN_FEATURE_EXTRACTION:
     print train_important_information
 
     print "Train feature extraction is completed."
+
 
 
 if TRAIN_NN:
