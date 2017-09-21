@@ -1,6 +1,6 @@
 '''
 @author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
-@date: 14.09.2017
+@date: 21.09.2017
 @version: 1.0+
 @copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
 @license : MIT License
@@ -18,18 +18,17 @@ class Visualize_single_utterance(object):
 
         utt_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
         random_utterance_id = int (config.get('visualization', 'random_utterance_id'))
-        with open(utt_dir+"/utt_"+str(random_utterance_id), "rb") as fp:
-            utt_mat = pickle.load(fp)
+        
+        with open(utt_dir+"/utt_dict", "rb") as fp:
+            utt_dict = pickle.load(fp)
+        utt_id_list = utt_dict.keys()
+        utt_id = utt_id_list[random_utterance_id]
+        utt_mat = utt_dict[utt_id]
 
-        utt_mat = np.array(utt_mat)
-        utt_mat = utt_mat.reshape(utt_mat.shape[1], utt_mat.shape[2])
-
-        input_seq_length = [utt_mat.shape[0]]
+        self.input_seq_length = [utt_mat.shape[0]]
         #pad the inputs
-        utt_mat = np.append(utt_mat, np.zeros([max_length-utt_mat.shape[0], utt_mat.shape[1]]), 0)
+        self.utt_mat = np.append(utt_mat, np.zeros([max_length-utt_mat.shape[0], utt_mat.shape[1]]), 0)
 
-        self.input_seq_length = input_seq_length
-        self.utt_mat = utt_mat
         self.save_dir = config.get('directories', 'exp_dir') + '/NN_train_dir'
         self.max_length = test_important_information['test_utt_max_length']
         self.input_dim = train_important_information['input_dim']
@@ -135,13 +134,6 @@ class Visualize_single_utterance(object):
             print 'Completed decoding for epoch: ' + str(self.epoch_id)
 
             return results, weights, biases
-
-
-
-
-
-
-
 
 
 
