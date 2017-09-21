@@ -315,7 +315,7 @@ class features_extraction(object):
                 batch_count += 1
 
         important_info = {'train_utt_max_length': self.max_length, 
-                   'training_batch_total': batch_count, 
+                   'training_batch_total': batch_count - 1, 
                    'total_training_utterances': self.total_number_of_utterances, 
                    'input_dim': self.input_dim,
                    'num_labels':self.num_labels,
