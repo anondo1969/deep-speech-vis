@@ -46,7 +46,7 @@ class Simple_multy_layer_perceptron(object):
         batch_size = int(config.get('simple_NN', 'batch_size'))
         valid_batch_number = int(config.get('simple_NN', 'valid_batches'))
         n_classes = train_important_information['num_labels']
-        total_batch = train_important_information['training_batch_total'] - 1 #temp
+        total_batch = train_important_information['training_batch_total']
         max_input_length = train_important_information['train_utt_max_length']
         max_target_length = train_important_information['train_label_max_length']
 
