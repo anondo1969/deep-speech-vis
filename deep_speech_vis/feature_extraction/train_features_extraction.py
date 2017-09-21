@@ -1,30 +1,37 @@
+'''
+@author: Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@date: 21.09.2017
+@version: 1.0+
+@copyright: Copyright (c)  2017-2018, Mahbub Ul Alam (alammb@ims.uni-stuttgart.de)
+@license : MIT License
+'''
+
 import numpy as np
 import gzip
 import pickle
 import random
 import os
-import shutil
 
 class features_extraction(object):
 
     def __init__(self, config):
 
         self.context_width = int(config.get('simple_NN', 'context_width'))
-        self.ark_file_name = config.get('directories', 'train_ark')
         self.save_dir = config.get('directories', 'exp_dir') + '/train_features_dir'
         self.batch_size = int(config.get('simple_NN', 'batch_size'))
         self.pdf_file_dir = config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name')
         self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
+        self.ark_file_dir = config.get('directories', 'train_ark_dir')
+        self.ark_file_no = int(config.get('general', 'ark_file_no'))
+
+        self.max_length = 0
+        self.total_number_of_utterances = 0
+        self.input_dim = 0
+        self.input_dim_check = False
 
 
         if not os.path.isdir(self.save_dir):
             os.mkdir(self.save_dir)
-
-
-        self.temp_dir = self.save_dir + '/temp_dir'
-        if not os.path.isdir(self.temp_dir):
-            os.mkdir(self.temp_dir)
-
 
     def splice(self, utt):
         '''
@@ -146,7 +153,7 @@ class features_extraction(object):
 
         prior = prior/prior.sum()
 
-        np.save(self.pdf_file_dir + '/prior_my_new_calculation.npy', prior)
+        np.save(self.pdf_file_dir + '/prior.npy', prior)
 
 
     def get_target_array(self, utt_id):
@@ -158,18 +165,14 @@ class features_extraction(object):
  
         return targets
 
-    def get_utterance_array(self):
+    def get_utterance_dict(self, file_name):
 
         seq_length_count = 0
-        max_length = 0
-        total_number_of_utterances = 0
         target_match = False
-        input_dim = 0
         utt_id = ""
-        input_dim_check = False
         utt_dict = {}
 
-        raw_data = open(self.ark_file_name)
+        raw_data = open(file_name)
         file_data = raw_data.read().split("\n")
         raw_data.close()
 
@@ -197,22 +200,22 @@ class features_extraction(object):
                     splice_fetures_per_utt, splice_done = self.splice(fetures_per_utt)
 
                     if splice_done:
-                        utt_dict[utt_id] = total_number_of_utterances
-                        np.save(self.temp_dir + '/utt_'+str(total_number_of_utterances)+'.npy', splice_fetures_per_utt)
+
+                        utt_dict[utt_id] = splice_fetures_per_utt
 
                         target_match = False
 
-                        if seq_length_count > max_length:
-                            max_length = seq_length_count
+                        if seq_length_count > self.max_length:
+                            self.max_length = seq_length_count
 
                         seq_length_count = 0
-                        total_number_of_utterances += 1
-                        print 'utt_no: ' + str(total_number_of_utterances) + ' utt_id: ' + utt_id
+                        self.total_number_of_utterances += 1
+                        #print 'utt_no: ' + str(self.total_number_of_utterances) + ' utt_id: ' + utt_id
 
                         #get the input dim number only once
-                        if input_dim_check == False:
-                            input_dim = splice_fetures_per_utt.shape[1]
-                            input_dim_check = True
+                        if self.input_dim_check == False:
+                            self.input_dim = splice_fetures_per_utt.shape[1]
+                            self.input_dim_check = True
 
                     else:
                         seq_length_count = 0
@@ -224,12 +227,6 @@ class features_extraction(object):
                     features_per_frame.append(fetures_list)
                     seq_length_count += 1
 
-        self.max_length = max_length
-        self.total_number_of_utterances = total_number_of_utterances
-        self.input_dim = input_dim
-
-        with open(self.save_dir+"/utt_dict", "wb") as fp:
-            pickle.dump(utt_dict, fp)
 
         return utt_dict
 
@@ -242,14 +239,7 @@ class features_extraction(object):
         np.save(self.save_dir+'/batch_input_seq_length_'+str(step)+'.npy', processed_batch_input_seq_length)
         np.save(self.save_dir+'/batch_output_seq_length_'+str(step)+'.npy', processed_batch_output_seq_length)
 
-        batch_data_information_file = open(self.save_dir+'/batch_data_information', "a")
-        batch_data_information_file.write(self.save_dir+'/batch_inputs_'+str(step)+'.npy'+'\n')
-        batch_data_information_file.write(self.save_dir+'/batch_targets_'+str(step)+'.npy'+'\n')
-        batch_data_information_file.write(self.save_dir+'/batch_input_seq_length_'+str(step)+'.npy'+'\n')
-        batch_data_information_file.write(self.save_dir+'/batch_output_seq_length_'+str(step)+'.npy'+'\n')
-        batch_data_information_file.close()
-
-        print 'Batch ' + str(step + 1) + ' completed'
+        print 'Zero padding on Batch ' + str(step + 1) + ' is completed.'
 
 
     def process_kaldi_batch_data(self, inputs, targets):
@@ -282,21 +272,37 @@ class features_extraction(object):
         self.target_dict = self.make_target_dict()
 
         self.save_target_prior()
+        
+        utt_dict = {}
 
-        utt_dict = self.get_utterance_array()
+        for file_id in range(self.ark_file_no):
+        
+            file_name = self.ark_file_dir +'/ark_'+ str(file_id + 1)
 
-        utt_id_list = utterances.keys()
+            part_utt_dict = self.get_utterance_dict(file_name)
+
+            utt_dict.update(part_utt_dict)
+
+        #with open(self.save_dir+"/utt_dict", "wb") as fp:
+            #pickle.dump(utt_dict, fp)
+        
+        #with open(self.save_dir+"/utt_dict", "rb") as fp:
+            #utt_dict = pickle.load(fp)
+
+        utt_id_list = utt_dict.keys()
         random.shuffle(utt_id_list)
+
+        print len(utt_id_list)
 
         utt_mat = []
         target_mat = []
         batch_count = 0
 
+        
         for id_count in range(len(utt_id_list)):
 
             utt_key = utt_id_list[id_count]
-            utt_id = utt_dict[utt_key]
-            utt_array = np.load(self.temp_dir + '/utt_'+str(utt_id)+'.npy')
+            utt_array = utt_dict[utt_key]
             target_array = self.get_target_array(utt_key)
             utt_mat.append(utt_array)
             target_mat.append(target_array)
@@ -309,7 +315,7 @@ class features_extraction(object):
                 batch_count += 1
 
         important_info = {'train_utt_max_length': self.max_length, 
-                   'training_batch_total': batch_count + 1, 
+                   'training_batch_total': batch_count, 
                    'total_training_utterances': self.total_number_of_utterances, 
                    'input_dim': self.input_dim,
                    'num_labels':self.num_labels,
@@ -318,10 +324,8 @@ class features_extraction(object):
         with open(self.save_dir+"/train_important_info", "wb") as fp:
             pickle.dump(important_info, fp)
 
-        #shutil.rmtree(self.temp_dir)
-
         return important_info
-
+        
 
 def get_important_info(save_dir):
 
@@ -329,4 +333,3 @@ def get_important_info(save_dir):
         important_info = pickle.load(fp)
 
     return important_info
-
