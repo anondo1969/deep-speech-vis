@@ -18,16 +18,15 @@ from visualization import utterance_visualization, analyze_relevance
 import numpy as np
 import pickle
 
-#select which one to run by 'True'. It is arranged sequentially and independently. So, no need to re-run
-# any module succefully more than once
+#select which one to run by providing 'True'. It is arranged sequentially and independently. So, no need to re-run any module succefully more than once
 
 # All modules
 TRAIN_FEATURE_EXTRACTION = False
-TRAIN_NN = True
+TRAIN_NN = False
 TEST_FEATURE_EXTRACTION = False
 DECODE_NN = False
 DECODE_KALDI = False
-VISUALIZE_UTTERANCE = False
+VISUALIZE_UTTERANCE = True
 
 #read config file
 config = configparser.ConfigParser()
@@ -131,7 +130,7 @@ if VISUALIZE_UTTERANCE:
         test_info = test_features_extraction.get_important_info(save_dir)
 
     random_utterance_id = int (config.get('visualization', 'random_utterance_id'))
-    total_uttarences = test_important_information['total_test_utterances']
+    total_uttarences = test_info['total_test_utterances']
 
     if random_utterance_id < 0 or random_utterance_id >= total_uttarences:
 
@@ -140,7 +139,7 @@ if VISUALIZE_UTTERANCE:
     else:
 
         relevance_methods = ['simple_lrp', 'flat_lrp', 'ww_lrp', 'epsilon_lrp', 'alphabeta_lrp']
-
+        relevance_method_name = config.get('visualization', 'visualization_method')
         if relevance_method_name in relevance_methods:
 
             visualize = utterance_visualization.Visualize_single_utterance(config, train_info, test_info)
