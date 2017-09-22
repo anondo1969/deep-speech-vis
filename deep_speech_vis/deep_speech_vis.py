@@ -6,7 +6,7 @@
 @license : MIT License
 '''
 
-'''@file main.py
+'''@file deep_speech_vis.py
 run this file to go through the neural net training procedure, look at the 'deep_speech_vis_configuration.cfg' file to modify the settings'''
 
 import os
