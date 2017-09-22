@@ -36,17 +36,17 @@ How to Run:
         gunzip -c exp/tri2b_ali_si284/ali.$i.gz 
         | ali-to-pdf exp/tri2b_ali_si284/final.mdl ark:- ark,t:- 
         | gzip >  exp/tri2b_ali_si284/pdf.$i.gz
+    please keep all the pdf file in the same 'alignment directory'.
+    
+	c. Take the 'graph_xyz' directory (for example 'graph_nosp_tgpr' from 'tri2b' directory) and rename it 
+	   to only 'graph' and copy it inside of the 'alignment directory' (for example 'tri2b_ali_si284')
 
-	c. Take the 'graph_xyz' directory (for example of 'LDA+MLLT') and rename it 
-	   to only 'graph' and copy it inside of the 'alignment directory'
-
-	d. Copy the whole 'alignment directory' inside of the 
-	   ' 'your-exp-dir' directory. 
-	   (for details see the 'deep_speech_vis_configuration.cfg' file)
+	d. Copy the whole 'alignment directory' inside of the 'your-exp-dir' directory. Provide the name of this 'alignment directory' 
+	   in 'gmm_name' in the 'deep_speech_vis_configuration.cfg' file. I renamed the 'tri2b_ali_si284' as 'gmm_lda_mllt' for
+	   clear understanding.
 	   
 	e. Convert the kaldi ark files (raw test and train ark files and cmvn test and train ark files) to text files and append those in a single 
-	   text file for both train and test ark files.
-	   
+	   text file for both train and test ark files. Provide the full path of these 4 ark files in the 'deep_speech_vis_configuration.cfg' file.
 	   
         # run from s5 directory
         . ./cmd.sh
@@ -62,16 +62,16 @@ How to Run:
 
 
 2. Change the required parameters in 'deep_speech_vis/deep_speech_vis_configuration.cfg' file 
-   according to your choice
+   according to your choice.
 
 3. Select required operations in 'deep_speech_vis/deep_speech_vis.py' file by selecting 'True' or 
    'False'.
 
-4. Run the 'deep_speech_vis/deep_speech_vis.py' file
+4. Run the 'deep_speech_vis/deep_speech_vis.py' file.
 
 5. See results in 'your-exp-dir/NN_train_dir/logdir/accuracy_log' file 
    and 
-   'your-exp-dir/decode_dir/kaldi_decode/scoring/best_wer' file
+   'your-exp-dir/decode_dir/kaldi_decode/scoring/best_wer' file.
 
 6. Some important information can be found in print information if you run the
    'deep_speech_vis/deep_speech_vis.py' file with a saving log.
@@ -80,9 +80,10 @@ How to Run:
    using the following command (in a terminal),
 
                   tensorboard --logdir=your-exp-dir/NN_train_dir/logdir
-8. There are several methods for calculating relevance, choose them from the configuration file
+                  
+8. There are several methods for calculating relevance, choose them from the configuration file.
 
 9. You can scale the image according to your choice in terms of heat-map points by giving
-   value in the configuration file
+   value in the configuration file.
 
 10. See the image containing heat-map in 'your-exp-dir/heat_map_image_dir'.
