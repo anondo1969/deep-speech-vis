@@ -24,7 +24,7 @@ How to Run:
 	the '.ali' files to '.pdf' files by doing the following,
    	(the range can be found from 'num_jobs' file)
 
-        #run the command from the s5 directory
+        # run the command from the s5 directory
         . ./cmd.sh
         . ./path.sh
         . utils/parse_options.sh
@@ -36,7 +36,7 @@ How to Run:
         gunzip -c exp/tri2b_ali_si284/ali.$i.gz 
         | ali-to-pdf exp/tri2b_ali_si284/final.mdl ark:- ark,t:- 
         | gzip >  exp/tri2b_ali_si284/pdf.$i.gz
-    please keep all the pdf file in the same 'alignment directory'.
+        # please keep all the pdf file in the same 'alignment directory'.
     
 	c. Take the 'graph_xyz' directory (for example 'graph_nosp_tgpr' from 'tri2b' directory) and rename it 
 	   to only 'graph' and copy it inside of the 'alignment directory' (for example 'tri2b_ali_si284')
