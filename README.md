@@ -44,7 +44,7 @@ How to Run:
 	   ' 'your-exp-dir' directory. 
 	   (for details see the 'deep_speech_vis_configuration.cfg' file)
 	   
-	e. Convert the kaldi ark files to text files and append those in a single 
+	e. Convert the kaldi ark files (raw test and train ark files and cmvn test and train ark files) to text files and append those in a single 
 	   text file for both train and test ark files.
 	   
 	   
