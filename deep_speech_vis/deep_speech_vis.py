@@ -22,10 +22,10 @@ import pickle
 
 # All modules
 TRAIN_FEATURE_EXTRACTION = False
-TRAIN_NN = False
-TEST_FEATURE_EXTRACTION = False
-DECODE_NN = False
-DECODE_KALDI = False
+TRAIN_NN = True
+TEST_FEATURE_EXTRACTION = True
+DECODE_NN = True
+DECODE_KALDI = True
 VISUALIZE_UTTERANCE = True
 
 #read config file
@@ -123,14 +123,14 @@ if VISUALIZE_UTTERANCE:
 
     if not train_important_information:
         save_dir = config.get('directories', 'exp_dir') + '/train_features_dir'
-        train_info = train_features_extraction.get_important_info(save_dir)
+        train_important_information = train_features_extraction.get_important_info(save_dir)
 
     if not test_important_information:
         save_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
-        test_info = test_features_extraction.get_important_info(save_dir)
+        test_important_information = test_features_extraction.get_important_info(save_dir)
 
     random_utterance_id = int (config.get('visualization', 'random_utterance_id'))
-    total_uttarences = test_info['total_test_utterances']
+    total_uttarences = test_important_information['total_test_utterances']
 
     if random_utterance_id < 0 or random_utterance_id >= total_uttarences:
 
@@ -142,7 +142,7 @@ if VISUALIZE_UTTERANCE:
         relevance_method_name = config.get('visualization', 'visualization_method')
         if relevance_method_name in relevance_methods:
 
-            visualize = utterance_visualization.Visualize_single_utterance(config, train_info, test_info)
+            visualize = utterance_visualization.Visualize_single_utterance(config, train_important_information, test_important_information)
 
             epochs = int(config.get('simple_NN', 'training_epochs'))
 
