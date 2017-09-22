@@ -23,6 +23,8 @@ class features_extraction(object):
         self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
         self.ark_file_dir = config.get('directories', 'train_ark_dir')
         self.ark_file_no = int(config.get('general', 'ark_file_no'))
+        self.train_cmvn_ark = config.get('directories', 'train_cmvn_ark')
+        self.cmvn_dict = self.get_cmvn_dict(self.train_cmvn_ark)
 
         self.max_length = 0
         self.total_number_of_utterances = 0
@@ -32,6 +34,72 @@ class features_extraction(object):
 
         if not os.path.isdir(self.save_dir):
             os.mkdir(self.save_dir)
+
+    def get_cmvn_dict(self, file_name):
+
+        spk_id = ""
+        cmvn_dict = {}
+
+        raw_data = open(file_name)
+        file_data = raw_data.read().split("\n")
+        raw_data.close()
+
+        for line in file_data:
+            list_line = line.split()
+
+            if len(list_line) > 0:
+  
+                if list_line[1] == "[":
+
+                    spk_id = list_line[0]
+                    cmvn_data_list = []
+                    
+                elif list_line[-1] == "]":
+    
+                    del list_line[-1]
+
+                    cmvn_data = [float(i) for i in list_line]
+                    cmvn_data_list.append(cmvn_data)
+                    cmvn_data_array = np.array(cmvn_data_list)
+                    cmvn_dict[spk_id] = cmvn_data_array
+
+                else:
+
+                    cmvn_data = [float(i) for i in list_line]
+                    cmvn_data_list.append(cmvn_data)
+
+        return cmvn_dict
+
+    def apply_cmvn(self, utt, utt_id):
+
+        '''
+        apply mean and variance normalisation
+
+        The mean and variance statistics are computed on previously seen data
+
+        Args:
+            utt: the utterance feature numpy matrix
+            stats: a numpy array containing the mean and variance statistics. The
+                first row contains the sum of all the fautures and as a last element
+                the total number of features. The second row contains the squared
+                sum of the features and a zero at the end
+
+        Returns:
+            a numpy array containing the mean and variance normalized features
+        '''
+
+        spk_id = utt_id[:3]
+    
+        stats = self.cmvn_dict[spk_id]
+
+        #compute mean
+        mean = stats[0, :-1]/stats[0, -1]
+
+        #compute variance
+        variance = stats[1, :-1]/stats[0, -1] - np.square(mean)
+
+        #return mean and variance normalised utterance
+        return np.divide(np.subtract(utt, mean), np.sqrt(variance))
 
     def splice(self, utt):
         '''
@@ -196,8 +264,8 @@ class features_extraction(object):
                     fetures_list = [float(i) for i in list_line]
                     features_per_frame.append(fetures_list)
                     fetures_per_utt = np.array(features_per_frame)
-
-                    splice_fetures_per_utt, splice_done = self.splice(fetures_per_utt)
+                    fetures_per_utt_normalized = self.apply_cmvn(fetures_per_utt, utt_id)
+                    splice_fetures_per_utt, splice_done = self.splice(fetures_per_utt_normalized)
 
                     if splice_done:
 
@@ -210,7 +278,7 @@ class features_extraction(object):
 
                         seq_length_count = 0
                         self.total_number_of_utterances += 1
-                        #print 'utt_no: ' + str(self.total_number_of_utterances) + ' utt_id: ' + utt_id
+                        print 'utt_no: ' + str(self.total_number_of_utterances) + ' utt_id: ' + utt_id
 
                         #get the input dim number only once
                         if self.input_dim_check == False:
