@@ -17,10 +17,10 @@ class features_extraction(object):
     def __init__(self, config):
 
         self.context_width = int(config.get('simple_NN', 'context_width'))
-        self.ark_file_name = config.get('directories', 'test_ark')
+        self.ark_file_name = config.get('general', 'test_ark')
         self.save_dir = config.get('directories', 'exp_dir') + '/test_features_dir'
         self.batch_size = int(config.get('simple_NN', 'batch_size'))
-        self.test_cmvn_ark = config.get('directories', 'test_cmvn_ark')
+        self.test_cmvn_ark = config.get('general', 'test_cmvn_ark')
         self.cmvn_dict = self.get_cmvn_dict(self.test_cmvn_ark)
 
         if not os.path.isdir(self.save_dir):
