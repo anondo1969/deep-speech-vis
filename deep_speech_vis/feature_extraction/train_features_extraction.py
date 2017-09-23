@@ -21,9 +21,8 @@ class features_extraction(object):
         self.batch_size = int(config.get('simple_NN', 'batch_size'))
         self.pdf_file_dir = config.get('directories', 'exp_dir') + '/' + config.get('general', 'gmm_name')
         self.pdf_file_total = int(config.get('general', 'num_pdf_files'))
-        self.ark_file_dir = config.get('directories', 'train_ark_dir')
-        self.ark_file_no = int(config.get('general', 'ark_file_no'))
-        self.train_cmvn_ark = config.get('directories', 'train_cmvn_ark')
+        self.ark_file = config.get('general', 'train_ark')
+        self.train_cmvn_ark = config.get('general', 'train_cmvn_ark')
         self.cmvn_dict = self.get_cmvn_dict(self.train_cmvn_ark)
 
         self.max_length = 0
@@ -341,15 +340,7 @@ class features_extraction(object):
 
         self.save_target_prior()
         
-        utt_dict = {}
-
-        for file_id in range(self.ark_file_no):
-        
-            file_name = self.ark_file_dir +'/ark_'+ str(file_id + 1)
-
-            part_utt_dict = self.get_utterance_dict(file_name)
-
-            utt_dict.update(part_utt_dict)
+        utt_dict = self.get_utterance_dict(self.ark_file)
 
         #with open(self.save_dir+"/utt_dict", "wb") as fp:
             #pickle.dump(utt_dict, fp)
