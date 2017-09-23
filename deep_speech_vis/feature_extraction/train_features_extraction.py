@@ -277,7 +277,7 @@ class features_extraction(object):
 
                         seq_length_count = 0
                         self.total_number_of_utterances += 1
-                        print 'utt_no: ' + str(self.total_number_of_utterances) + ' utt_id: ' + utt_id
+                        #print 'utt_no: ' + str(self.total_number_of_utterances) + ' utt_id: ' + utt_id
 
                         #get the input dim number only once
                         if self.input_dim_check == False:
@@ -351,7 +351,7 @@ class features_extraction(object):
         utt_id_list = utt_dict.keys()
         random.shuffle(utt_id_list)
 
-        print len(utt_id_list)
+        #print len(utt_id_list)
 
         utt_mat = []
         target_mat = []
