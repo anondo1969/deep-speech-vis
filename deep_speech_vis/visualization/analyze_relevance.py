@@ -32,7 +32,7 @@ class relevance_analyzer(object):
             elif relevance_method == "ww_lrp":
                 relevance = relevance_methods.ww_lrp(results[i+1], results[i], biases[i], weights[i])
             elif relevance_method == "epsilon_lrp":
-                relevance = relevance_methods.simple_lrp(results[i+1], results[i], biases[i], weights[i], epsilon_value)
+                relevance = relevance_methods.epsilon_lrp(results[i+1], results[i], biases[i], weights[i], epsilon_value)
             elif relevance_method == "alphabeta_lrp":
                 relevance = relevance_methods.alphabeta_lrp(results[i+1], results[i], biases[i], weights[i], alpha_value)
             
