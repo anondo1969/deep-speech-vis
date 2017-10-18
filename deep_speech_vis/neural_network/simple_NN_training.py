@@ -144,7 +144,7 @@ class Simple_multy_layer_perceptron(object):
 
             with tf.name_scope("targets-processing"):
 
-                #split the 3D targets tensor in a list of batch_size*input_dim tensors
+                #split the 3D targets tensor in a list of batch_size*1 tensors
                 split_targets = tf.unstack(targets)
 
                 nonseq_targets = seq_convertors.seq2nonseq(split_targets, target_seq_length, 
