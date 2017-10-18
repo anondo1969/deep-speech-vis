@@ -41,7 +41,7 @@ def seq2nonseq(tensorlist, seq_length, name=None):
     Args:
         tensorlist: the sequential data, wich is a list containing an N x F
             tensor for each time step where N is the batch size and F is the
-            input dimension
+            input/output dimension
         seq_length: a vector containing the sequence lengths
         name: [optional] the name of the operation
 
@@ -78,7 +78,7 @@ def nonseq2seq(tensor, seq_length, length, name=None):
     Returns:
         sequential data, wich is a list containing an N x F
         tensor for each time step where N is the batch size and F is the
-        input dimension
+        input/output dimension
     '''
 
     with tf.name_scope(name or'nonseq2seq'):
