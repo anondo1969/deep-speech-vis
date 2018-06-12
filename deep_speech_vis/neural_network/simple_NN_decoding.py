@@ -147,7 +147,7 @@ class Decode(object):
                 output = outputs_value/self.prior
 
                 #floor the values to avoid problems with log
-                np.where(output == 0, np.finfo(float).eps, output)
+                output = np.where(output == 0, np.finfo(float).eps, output)
 
                 # print (output.shape)
                 # print (type(output))
