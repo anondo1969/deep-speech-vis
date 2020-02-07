@@ -1,5 +1,7 @@
 Description:
 
+    (Master Thesis Work)
+
     1. A baseline speech recognition software where the neural net is trained with 
     tensorFlow and GMM training and decoding are done in kaldi toolkit.
 
