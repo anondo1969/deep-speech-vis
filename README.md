@@ -4,7 +4,7 @@ Description:
     
 Alam, Mahbub Ul, From Speech to Image: A Novel Approach to Understand the Hidden Layer Mechanisms of Deep Neural Networks in Automatic Speech Recognition, Masterarbeit, Institut für Maschinelle Sprachverarbeitung, Universität Stuttgart, 2017. (https://www.ims.uni-stuttgart.de/en/research/publications/theses/)
     
-Master Thesis Link: https://drive.google.com/file/d/1wnS1NiQBGZpMLbNh4pAghsMzxrK0JaI8/
+Master Thesis Link: http://dx.doi.org/10.13140/RG.2.2.18693.01765
     
 Abstract: Currently deep neural network based models are showing state of the art results in automatic speech recognition domain. However, still plenty of questions are left undetermined to understand the computational data flow, and feature classification process of hidden layers in deep neural networks. Visualization in hidden layer mechanisms can provide valuable insights regarding this understanding. In order to address this issue, this work reviews the recent visualization techniques used in computer vision domain for kernels and deep neural networks, and then applies one of these techniques ‘layer-wise relevance propagation’ algorithm in automatic speech recognition task for the first time. This work attempts to make the hidden layers in deep learning systems more interpretable by adding another visualization tool in the whole automatic speech recognition process chain. Several hidden layer mechanisms such as ‘learning after each epoch change’, ‘effectiveness of context-window’, ‘impact of speech quality degradation in speech recognition’, and ‘difference between identifying vowels and consonant phones’ are analyzed using relevance score based images.
     
