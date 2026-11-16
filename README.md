@@ -1,3 +1,5 @@
+![Figure 1](master-poster.png)
+
 Description:
 
 (Master Thesis Work)
