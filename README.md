@@ -1,4 +1,6 @@
-![Figure 1](master-poster.png)
+<a href="https://mahbub.se/media/Masters_Thesis_Mahbub_Ul_Alam.pdf">
+  <img src="master-poster.png" alt="Master Poster">
+</a>
 
 Description:
 
