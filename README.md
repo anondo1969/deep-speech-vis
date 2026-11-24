@@ -1,18 +1,22 @@
+# Master’s Degree in Computational Linguistics at the Institute for Natural Language Processing, University of Stuttgart (Oct 2015 – Oct 2017)
+
+## Click the poster to read the Master thesis
+
 <a href="https://mahbub.se/media/Masters_Thesis_Mahbub_Ul_Alam.pdf">
   <img src="master-poster.png" alt="Master Poster">
 </a>
 
-Description:
+## Description:
 
-(Master Thesis Work)
+### (Master Thesis Work)
     
 Alam, Mahbub Ul, From Speech to Image: A Novel Approach to Understand the Hidden Layer Mechanisms of Deep Neural Networks in Automatic Speech Recognition, Masterarbeit, Institut für Maschinelle Sprachverarbeitung, Universität Stuttgart, 2017. (https://www.ims.uni-stuttgart.de/en/research/publications/theses/)
     
-Master Thesis Link: http://dx.doi.org/10.13140/RG.2.2.18693.01765
+**Master Thesis Link:** http://dx.doi.org/10.13140/RG.2.2.18693.01765
     
-Abstract: Currently deep neural network based models are showing state of the art results in automatic speech recognition domain. However, still plenty of questions are left undetermined to understand the computational data flow, and feature classification process of hidden layers in deep neural networks. Visualization in hidden layer mechanisms can provide valuable insights regarding this understanding. In order to address this issue, this work reviews the recent visualization techniques used in computer vision domain for kernels and deep neural networks, and then applies one of these techniques ‘layer-wise relevance propagation’ algorithm in automatic speech recognition task for the first time. This work attempts to make the hidden layers in deep learning systems more interpretable by adding another visualization tool in the whole automatic speech recognition process chain. Several hidden layer mechanisms such as ‘learning after each epoch change’, ‘effectiveness of context-window’, ‘impact of speech quality degradation in speech recognition’, and ‘difference between identifying vowels and consonant phones’ are analyzed using relevance score based images.
+**Abstract:** Currently deep neural network based models are showing state of the art results in automatic speech recognition domain. However, still plenty of questions are left undetermined to understand the computational data flow, and feature classification process of hidden layers in deep neural networks. Visualization in hidden layer mechanisms can provide valuable insights regarding this understanding. In order to address this issue, this work reviews the recent visualization techniques used in computer vision domain for kernels and deep neural networks, and then applies one of these techniques ‘layer-wise relevance propagation’ algorithm in automatic speech recognition task for the first time. This work attempts to make the hidden layers in deep learning systems more interpretable by adding another visualization tool in the whole automatic speech recognition process chain. Several hidden layer mechanisms such as ‘learning after each epoch change’, ‘effectiveness of context-window’, ‘impact of speech quality degradation in speech recognition’, and ‘difference between identifying vowels and consonant phones’ are analyzed using relevance score based images.
     
-Summary:
+**Summary:**
 
 1. A baseline speech recognition software where the neural net is trained with 
     tensorFlow and GMM training and decoding are done in kaldi toolkit.
@@ -22,13 +26,13 @@ Summary:
 3. Process of adding noise to the input features to create acoustic simulation
 
 
-Requirement:
+**Requirement:**
 
 1. kaldi
 2. tensorflow
 
 
-How to Run:
+**How to Run:**
 
 1. Complete the HMM-GMM model using kaldi,
 
