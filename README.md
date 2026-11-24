@@ -1,6 +1,6 @@
 # Master’s Degree in Computational Linguistics at the Institute for Natural Language Processing, University of Stuttgart (Oct 2015 – Oct 2017)
 
-## Click the poster to read the Master thesis
+## Click the poster to read the master’s thesis.
 
 <a href="https://mahbub.se/media/Masters_Thesis_Mahbub_Ul_Alam.pdf">
   <img src="master-poster.png" alt="Master Poster">
